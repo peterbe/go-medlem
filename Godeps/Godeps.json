@@ -1,0 +1,13 @@
+{
+	"ImportPath": "github.com/sger/go-iris-heroku",
+	"GoVersion": "go1.6",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/kataras/iris",
+			"Rev": "5a9f7a2f20015af1e2f0e07c5c132ef67a941766"
+		}
+	]
+}
