@@ -2,6 +2,7 @@ package main
 
 import (
     "log"
+    "fmt"
     "os"
     "github.com/kataras/iris"
     )
@@ -23,12 +24,14 @@ func main() {
 
 	if port == "" {
 		log.Fatal("$PORT must be set")
-	}
+	} else {
+        fmt.Sprintf("PORT=%s\n", port)
+    }
 
     // iris.Config.Render.Template.IsDevelopment = true
 
     api := iris.New()
     api.Get("/helloworld", helloworld)
     api.Get("/", index)
-    api.Listen(port)
+    api.Listen(":" + port)
 }
