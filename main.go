@@ -25,7 +25,7 @@ func main() {
 		log.Fatal("$PORT must be set")
 	}
 
-    iris.Config.Render.Template.IsDevelopment = true
+    // iris.Config.Render.Template.IsDevelopment = true
 
     api := iris.New()
     api.Get("/helloworld", helloworld)
