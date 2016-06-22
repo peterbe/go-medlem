@@ -1,1 +1,1 @@
-web: go-medlem
+web: go-iris-heroku
