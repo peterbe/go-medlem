@@ -1,0 +1,12 @@
+{
+    "name": "go-medlem",
+    "description": "HTTP API for asking Mozilla LDAP simple questions",
+    "repository": {
+        "url": "https://github.com/peterbe/go-medlem",
+        "license": "MPL2"
+    },
+    "keywords": [
+        "ldap",
+        "go"
+    ]
+}

@@ -11,6 +11,87 @@
   <p>
     Going to write something more constructive here later.
   </p>
+
+  <form action="">
+    <label>Emails (one per line):</label><br />
+    <textarea rows="10" cols="40"></textarea><br />
+    <button type="submit">Validate</button>
+
+    <div id="error" style="display:none">
+      <h3 style="color:red">Submission Error</h3>
+      <pre>
+
+      </pre>
+    </div>
+    <div id="results" style="display:none">
+      <h3>Results</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>
+              Email
+            </th>
+            <th>
+              Result
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+      </table>
+    </div>
+  </form>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+  <script>
+  $(() => {
+    $('form').on('submit', (event) => {
+      event.preventDefault()
+      let emails = []
+      $('textarea').val().split(/\s/g).forEach((e) => {
+        if (e.trim()) {
+          emails.push(e.trim())
+        }
+      })
+      var container = $('#results tbody')
+      $('tr', container).remove()
+      emails.forEach((e) => {
+        $('<tr>')
+        .append(
+          $('<td>').text(e)
+        )
+        .append(
+          $('<td>').text('...')
+        )
+        .appendTo(container)
+      })
+      $('#results').show();
+      if (emails.length) {
+        $.ajax({
+          url: '/staff',
+          data: JSON.stringify({email: emails}),
+          method: 'POST',
+          dataType: 'json',
+        })
+        .then((r) => {
+          $('#error').hide()
+          $('tr', container).each((row) => {
+            let email = $('td:first-child', row).text();
+            $('td:last-child', row).text(r[email])
+          })
+        })
+        .fail((err) => {
+          $('#error pre')
+          .text(JSON.stringify(JSON.parse(err.responseText), undefined, 2))
+          $('#error').show()
+          console.error(err);
+          // alert('Failed')
+        })
+      }
+    })
+  })
+  </script>
 </body>
 
 </html>
