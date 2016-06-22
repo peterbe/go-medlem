@@ -33,5 +33,5 @@ func main() {
     api := iris.New()
     api.Get("/helloworld", helloworld)
     api.Get("/", index)
-    api.Listen(":" + port)
+    api.Listen("0.0.0.0:" + port)
 }
