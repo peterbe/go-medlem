@@ -67,8 +67,6 @@ func getEmails(ctx *iris.Context) ([]string, error) {
 				"Not a valid email address: " + email + " (" + err.Error() + ")",
 			)
 		}
-		// log.Println(e.Name, e.Address)
-		// parsedEmails.append(e.Address)
 		parsedEmails = append(parsedEmails, e.Address)
 	}
 
@@ -84,7 +82,6 @@ func IsStaff(ctx *iris.Context) {
 		})
 		ctx.SetStatusCode(iris.StatusBadRequest) // 400
 	} else if len(emails) == 0 {
-		// ctx.Write("No emails supplied. See docs\n")
 		ctx.JSON(iris.StatusBadRequest, iris.Map{
 			"error": "No emails supplied. See docs",
 		})
@@ -93,7 +90,6 @@ func IsStaff(ctx *iris.Context) {
 	} else {
 		results := make(map[string]bool)
 		for _, email := range emails {
-			// log.Println("EMAIL:", email)
 			results[email] = false
 		}
 		ctx.JSON(iris.StatusOK, results)
