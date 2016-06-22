@@ -1,0 +1,11 @@
+{
+  "name": "go-medlem",
+  "version": "1.0.0",
+  "description": "TBD",
+  "main": "index.js",
+  "author": "Peter Bengtsson",
+  "license": "MPL2",
+  "dependencies": {
+    "jquery": "3.0.0"
+  }
+}

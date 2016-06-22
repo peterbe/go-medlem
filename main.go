@@ -120,6 +120,8 @@ func main() {
 	api.Get("/contribute.json", func(ctx *iris.Context) {
 		ctx.ServeFile("./contribute.json", false)
 	})
+	api.Static("/node_modules", "./node_modules/", 1)
+	api.Static("/static", "./static/", 1)
 	api.Get("/", index)
 	api.Listen("0.0.0.0:" + port)
 }
