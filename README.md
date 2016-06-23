@@ -7,13 +7,10 @@ About the project
 **THIS PROJECT IS IN PROTOTYPAL STAGES**
 
 This project aims to set up a server for HTTP interfacing with LDAP.
-Two core feature areas:
 
-1) Be able to ask simple questions in HTTP GET and get a simple JSON response.
-   For example "Is example@example.org still an employee of Example inc?"
-
-2) If changes to membership happens, notify, by HTTP POST those who are
-concerned to know this.
+Core functionality: Be able to ask simple questions in HTTP GET and
+get a simple JSON response. 
+For example "Is example@example.org still an employee of Example inc?"
 
 About the name
 --------------
