@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/mail"
 	"os"
-	// "crypto/tls"
 )
 
 func index(ctx *iris.Context) {
@@ -23,23 +22,6 @@ func helloworld(ctx *iris.Context) {
 	log.Println(sampleMultiline)
 	filename := repackageAsFilepath(sampleMultiline)
 	defer os.Remove(filename) // clean up
-	// filename := sampleMultiline
-	// _, err := os.Stat(filename)
-	// if err != nil { // no such file or dir
-	// 	if len(sampleMultiline) > 0 {
-	// 		err := ioutil.WriteFile("/tmp/sample.multiline", []byte(sampleMultiline), 0644)
-	// 		if err != nil {
-	// 			panic(err)
-	// 		}
-	// 		defer os.Remove("/tmp/sample.multiline")
-	// 		// defer func() {
-	// 		// 	ioutil.RemoveFile("/tmp/sample.multiline")
-	// 		// }()
-	// 		filename = "/tmp/sample.multiline"
-	// 	} else {
-	// 		panic(err)
-	// 	}
-	// }
 	content, err := ioutil.ReadFile(filename)
 	if err != nil {
 		panic(err)
@@ -244,15 +226,6 @@ func main() {
 			log.Fatal(fmt.Sprintf("$%v must be set", key))
 		}
 	}
-	// if ldapURI == "" {
-	// 	log.Fatal("$LDAP_URI must be set")
-	// }
-	// if ldapUsername == "" {
-	// 	log.Fatal("$LDAP_USERNAME must be set")
-	// }
-	// if ldapPassword == "" {
-	// 	log.Fatal("$LDAP_PASSWORD must be set")
-	// }
 
 	api := iris.New()
 	api.Get("/helloworld", helloworld)
