@@ -2,10 +2,13 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/kataras/iris"
+	"go.mozilla.org/mozldap"
 	"log"
 	"net/mail"
 	"os"
+	// "crypto/tls"
 )
 
 func index(ctx *iris.Context) {
@@ -88,14 +91,68 @@ func IsStaff(ctx *iris.Context) {
 		ctx.SetStatusCode(iris.StatusBadRequest) // 400
 		return
 	} else {
+
+		client, err := mozldap.NewTLSClient(
+			ldapURI,
+			ldapUsername,
+			ldapPassword,
+			"/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.crt",
+			"/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.key",
+			// "/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.csr",
+			"",
+			nil,
+		)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer client.Close()
+
 		results := make(map[string]bool)
 		for _, email := range emails {
 			results[email] = false
 		}
+
+		mailFilter := ""
+		for _, email := range emails {
+			// XXX need escaping on the email. See how python-ldap does it in ldap.filter.filter_format
+			mailFilter += fmt.Sprintf(
+				// "(&(|(mail=%s)(emailAlias=%s))(objectClass=mozComPerson))",
+				"(&(mail=%s)(objectClass=mozComPerson))",
+				email, email,
+			)
+		}
+		mailFilter = fmt.Sprintf(
+			"(|%s)", mailFilter,
+		)
+		log.Println("mailFilter:", mailFilter)
+		entries, searchErr := client.Search(
+			"",
+			mailFilter,
+			// nil,  // use this to see all available/possible columns
+			// []string{"mail", "employeeType", "emailAlias"},
+			[]string{"mail"},
+		)
+		if searchErr != nil {
+			log.Fatal(searchErr)
+		}
+		// log.Println(entries)
+		for _, entry := range entries {
+			for _, attr := range entry.Attributes {
+				log.Println(attr.Name, ":", attr.Values)
+				if attr.Name == "mail" {
+					results[attr.Values[0]] = true
+				}
+			}
+		}
 		ctx.JSON(iris.StatusOK, results)
 	}
-
 }
+
+var (
+	ldapURI      string
+	ldapUsername string
+	ldapPassword string
+)
 
 func main() {
 	port := os.Getenv("PORT")
@@ -107,6 +164,19 @@ func main() {
 		log.Println("Running in debug mode")
 		// iris.Logger.Infof("Running in debug mode")
 		iris.Config.Render.Template.IsDevelopment = true
+	}
+
+	ldapURI = os.Getenv("LDAP_URI")
+	ldapUsername = os.Getenv("LDAP_USERNAME")
+	ldapPassword = os.Getenv("LDAP_PASSWORD")
+	if ldapURI == "" {
+		log.Fatal("$LDAP_URI must be set")
+	}
+	if ldapUsername == "" {
+		log.Fatal("$LDAP_USERNAME must be set")
+	}
+	if ldapPassword == "" {
+		log.Fatal("$LDAP_PASSWORD must be set")
 	}
 
 	api := iris.New()
