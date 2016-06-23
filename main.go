@@ -147,46 +147,12 @@ func IsStaff(ctx *iris.Context) {
 		if ldapKeyFilePath != ldapKeyFile {
 			defer os.Remove(ldapKeyFilePath)
 		}
-
-		// _, err := os.Stat(ldapCertFile)
-		// if err != nil {
-		//     // no such file or dir
-		//     if len(ldapCertFile) > 0 && strings.Contains(ldapCertFile, "\n") {
-		// 		err := ioutil.WriteFile("/tmp/ldap.crt", []byte(ldapCertFile), 0644)
-		// 		if err != nil {
-		// 			panic(err)
-		// 		}
-		// 		defer os.Remove("/tmp/ldap.crt")
-		// 		ldapCertFile = "/tmp/ldap.crt"
-		// 	} else {
-		// 		panic(err)
-		// 	}
-		// }
-		// _, err = os.Stat(ldapKeyFile)
-		// if err != nil {
-		//     // no such file or dir
-		//     if len(ldapKeyFile) > 0 && strings.Contains(ldapCertFile, "\n") {
-		// 		err := ioutil.WriteFile("/tmp/ldap.key", []byte(ldapKeyFile), 0644)
-		// 		if err != nil {
-		// 			panic(err)
-		// 		}
-		// 		defer os.Remove("/tmp/ldap.key")
-		// 		ldapCertFile = "/tmp/ldap.key"
-		// 	} else {
-		// 		panic(err)
-		// 	}
-		// }
-		log.Println("ldapCertFilePath", ldapCertFilePath)
-		log.Println("ldapKeyFilePath", ldapKeyFilePath)
 		client, err := mozldap.NewTLSClient(
 			ldapURI,
 			ldapUsername,
 			ldapPassword,
-			// "/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.crt",
 			ldapCertFilePath,
-			// "/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.key",
 			ldapKeyFilePath,
-			// "/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.csr",
 			"",
 			nil,
 		)
@@ -205,14 +171,14 @@ func IsStaff(ctx *iris.Context) {
 			// XXX need escaping on the email. See how python-ldap does it in ldap.filter.filter_format
 			mailFilter += fmt.Sprintf(
 				// "(&(|(mail=%s)(emailAlias=%s))(objectClass=mozComPerson))",
-				"(&(mail=%s)(objectClass=mozComPerson))",
+				"(mail=%s)",
 				// "(&(mail=%s)(!(employeeType=DISABLED)))",
 				// email, email
 				email,
 			)
 		}
 		mailFilter = fmt.Sprintf(
-			"(|%s)", mailFilter,
+			"(&(|%s)(objectClass=mozComPerson))", mailFilter,
 		)
 		log.Println("mailFilter:", mailFilter)
 		entries, searchErr := client.Search(
