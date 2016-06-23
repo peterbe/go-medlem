@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/kataras/iris"
 	"go.mozilla.org/mozldap"
+	"io/ioutil"
 	"log"
 	"net/mail"
 	"os"
@@ -19,7 +20,31 @@ func index(ctx *iris.Context) {
 }
 
 func helloworld(ctx *iris.Context) {
-	ctx.Write("Hi %s\n", sampleMultiline)
+	log.Println(sampleMultiline)
+	filename := repackageAsFilepath(sampleMultiline)
+	defer os.Remove(filename) // clean up
+	// filename := sampleMultiline
+	// _, err := os.Stat(filename)
+	// if err != nil { // no such file or dir
+	// 	if len(sampleMultiline) > 0 {
+	// 		err := ioutil.WriteFile("/tmp/sample.multiline", []byte(sampleMultiline), 0644)
+	// 		if err != nil {
+	// 			panic(err)
+	// 		}
+	// 		defer os.Remove("/tmp/sample.multiline")
+	// 		// defer func() {
+	// 		// 	ioutil.RemoveFile("/tmp/sample.multiline")
+	// 		// }()
+	// 		filename = "/tmp/sample.multiline"
+	// 	} else {
+	// 		panic(err)
+	// 	}
+	// }
+	content, err := ioutil.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+	ctx.Write("Hi %s\n", content)
 }
 
 type UsersForm struct {
@@ -73,6 +98,30 @@ func getEmails(ctx *iris.Context) ([]string, error) {
 
 }
 
+func repackageAsFilepath(thing string) string {
+	/* This function will always return a valid file path.
+	If the supplied parameter "thing" is not already a file, but a string,
+	we'll take its content and put it into a temp file. */
+	_, err := os.Stat(thing)
+	if err == nil {
+		// it was already a valid file
+		return thing
+	}
+	tmpfile, err := ioutil.TempFile("", "thing")
+	if err != nil {
+		log.Fatal(err)
+	}
+	//
+
+	if _, err := tmpfile.Write([]byte(thing)); err != nil {
+		log.Fatal(err)
+	}
+	if err := tmpfile.Close(); err != nil {
+		log.Fatal(err)
+	}
+	return tmpfile.Name()
+}
+
 func IsStaff(ctx *iris.Context) {
 	emails, err := getEmails(ctx)
 	if err != nil {
@@ -88,12 +137,52 @@ func IsStaff(ctx *iris.Context) {
 		return
 	} else {
 
+		// ldapCertFile and ldapKeyFile needs to be actual file paths
+		// to real files on the filesystem going into mozldap.NewTLSClient
+		// but they might have arrived to us in the form of multiline
+		// strings. E.g. as environment variables set in Heroku.
+		ldapCertFilePath := repackageAsFilepath(ldapCertFile)
+		defer os.Remove(ldapCertFilePath)
+		ldapKeyFilePath := repackageAsFilepath(ldapKeyFile)
+		defer os.Remove(ldapKeyFilePath)
+
+		// _, err := os.Stat(ldapCertFile)
+		// if err != nil {
+		//     // no such file or dir
+		//     if len(ldapCertFile) > 0 && strings.Contains(ldapCertFile, "\n") {
+		// 		err := ioutil.WriteFile("/tmp/ldap.crt", []byte(ldapCertFile), 0644)
+		// 		if err != nil {
+		// 			panic(err)
+		// 		}
+		// 		defer os.Remove("/tmp/ldap.crt")
+		// 		ldapCertFile = "/tmp/ldap.crt"
+		// 	} else {
+		// 		panic(err)
+		// 	}
+		// }
+		// _, err = os.Stat(ldapKeyFile)
+		// if err != nil {
+		//     // no such file or dir
+		//     if len(ldapKeyFile) > 0 && strings.Contains(ldapCertFile, "\n") {
+		// 		err := ioutil.WriteFile("/tmp/ldap.key", []byte(ldapKeyFile), 0644)
+		// 		if err != nil {
+		// 			panic(err)
+		// 		}
+		// 		defer os.Remove("/tmp/ldap.key")
+		// 		ldapCertFile = "/tmp/ldap.key"
+		// 	} else {
+		// 		panic(err)
+		// 	}
+		// }
+
 		client, err := mozldap.NewTLSClient(
 			ldapURI,
 			ldapUsername,
 			ldapPassword,
-			"/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.crt",
-			"/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.key",
+			// "/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.crt",
+			ldapCertFilePath,
+			// "/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.key",
+			ldapKeyFilePath,
 			// "/Users/peterbe/dev/MOZILLA/MEDLEM/ldap-bind/medlem/ldapproxy-medlem.csr",
 			"",
 			nil,
@@ -150,6 +239,8 @@ var (
 	ldapURI         string
 	ldapUsername    string
 	ldapPassword    string
+	ldapCertFile    string
+	ldapKeyFile     string
 	sampleMultiline string
 )
 
@@ -170,15 +261,29 @@ func main() {
 	ldapURI = os.Getenv("LDAP_URI")
 	ldapUsername = os.Getenv("LDAP_USERNAME")
 	ldapPassword = os.Getenv("LDAP_PASSWORD")
-	if ldapURI == "" {
-		log.Fatal("$LDAP_URI must be set")
+	ldapCertFile = os.Getenv("LDAP_CERT_FILE")
+	ldapKeyFile = os.Getenv("LDAP_KEY_FILE")
+	requiredKeys := []string{
+		"LDAP_URI",
+		"LDAP_USERNAME",
+		"LDAP_PASSWORD",
+		"LDAP_CERT_FILE",
+		"LDAP_KEY_FILE",
 	}
-	if ldapUsername == "" {
-		log.Fatal("$LDAP_USERNAME must be set")
+	for _, key := range requiredKeys {
+		if os.Getenv(key) == "" {
+			log.Fatal(fmt.Sprintf("$%v must be set", key))
+		}
 	}
-	if ldapPassword == "" {
-		log.Fatal("$LDAP_PASSWORD must be set")
-	}
+	// if ldapURI == "" {
+	// 	log.Fatal("$LDAP_URI must be set")
+	// }
+	// if ldapUsername == "" {
+	// 	log.Fatal("$LDAP_USERNAME must be set")
+	// }
+	// if ldapPassword == "" {
+	// 	log.Fatal("$LDAP_PASSWORD must be set")
+	// }
 
 	api := iris.New()
 	api.Get("/helloworld", helloworld)
