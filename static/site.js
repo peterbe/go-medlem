@@ -30,6 +30,7 @@ $(() => {
           dataType: 'json',
         })
         .then((r) => {
+          console.log("RESULTS", r);
           $('#error').hide()
           $('tr', container).each((row) => {
             let email = $('td:first-child', row).text();
