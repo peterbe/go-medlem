@@ -111,8 +111,6 @@ func repackageAsFilepath(thing string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//
-
 	if _, err := tmpfile.Write([]byte(thing)); err != nil {
 		log.Fatal(err)
 	}
