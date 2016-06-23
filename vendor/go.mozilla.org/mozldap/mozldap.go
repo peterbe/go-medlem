@@ -154,7 +154,7 @@ func NewTLSClient(uri, username, password, tlscertpath, tlskeypath, cacertpath s
 			panic(err)
 		}
 		if ok := ca.AppendCertsFromPEM(CAcert); !ok {
-			panic("failed XXXXXXXXX to import CA Certificate")
+			panic("failed to import CA Certificate")
 		}
 		tlsconf.RootCAs = ca
 	}

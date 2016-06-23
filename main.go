@@ -19,7 +19,7 @@ func index(ctx *iris.Context) {
 }
 
 func helloworld(ctx *iris.Context) {
-	ctx.Write("Hi %s\n", "world")
+	ctx.Write("Hi %s\n", sampleMultiline)
 }
 
 type UsersForm struct {
@@ -118,7 +118,9 @@ func IsStaff(ctx *iris.Context) {
 			mailFilter += fmt.Sprintf(
 				// "(&(|(mail=%s)(emailAlias=%s))(objectClass=mozComPerson))",
 				"(&(mail=%s)(objectClass=mozComPerson))",
-				email, email,
+				// "(&(mail=%s)(!(employeeType=DISABLED)))",
+				// email, email
+				email,
 			)
 		}
 		mailFilter = fmt.Sprintf(
@@ -149,12 +151,15 @@ func IsStaff(ctx *iris.Context) {
 }
 
 var (
-	ldapURI      string
-	ldapUsername string
-	ldapPassword string
+	ldapURI         string
+	ldapUsername    string
+	ldapPassword    string
+	sampleMultiline string
 )
 
 func main() {
+	sampleMultiline = os.Getenv("SAMPLE_MULTILINE")
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("$PORT must be set")
