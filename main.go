@@ -30,10 +30,6 @@ type UsersJSON struct {
 	Emails []string `json:"email"`
 }
 
-// func logger(format string, a ...interface{}) {
-//     iris.Logger.Infof(format, a)
-// }
-
 // private function
 func getEmails(ctx *iris.Context) ([]string, error) {
 	// var emails []string
