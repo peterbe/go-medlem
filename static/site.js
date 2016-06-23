@@ -30,11 +30,13 @@ $(() => {
           dataType: 'json',
         })
         .then((r) => {
-          console.log("RESULTS", r);
           $('#error').hide()
-          $('tr', container).each((row) => {
+          $('tr', container).each((i, row) => {
             let email = $('td:first-child', row).text();
             $('td:last-child', row).text(r[email])
+            if (r[email]) {
+              $('td:last-child', row).css('font-weight', 'bold')
+            }
           })
         })
         .fail((err) => {

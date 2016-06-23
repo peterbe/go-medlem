@@ -140,9 +140,13 @@ func IsStaff(ctx *iris.Context) {
 		// but they might have arrived to us in the form of multiline
 		// strings. E.g. as environment variables set in Heroku.
 		ldapCertFilePath := repackageAsFilepath(ldapCertFile)
-		defer os.Remove(ldapCertFilePath)
+		if ldapCertFilePath != ldapCertFile {
+			defer os.Remove(ldapCertFilePath)
+		}
 		ldapKeyFilePath := repackageAsFilepath(ldapKeyFile)
-		defer os.Remove(ldapKeyFilePath)
+		if ldapKeyFilePath != ldapKeyFile {
+			defer os.Remove(ldapKeyFilePath)
+		}
 
 		// _, err := os.Stat(ldapCertFile)
 		// if err != nil {
@@ -172,7 +176,8 @@ func IsStaff(ctx *iris.Context) {
 		// 		panic(err)
 		// 	}
 		// }
-
+		log.Println("ldapCertFilePath", ldapCertFilePath)
+		log.Println("ldapKeyFilePath", ldapKeyFilePath)
 		client, err := mozldap.NewTLSClient(
 			ldapURI,
 			ldapUsername,
