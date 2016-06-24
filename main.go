@@ -202,12 +202,6 @@ func main() {
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
-	debug := os.Getenv("DEBUG") == "true"
-	if debug {
-		log.Println("Running in debug mode")
-		// iris.Logger.Infof("Running in debug mode")
-		iris.Config.Render.Template.IsDevelopment = true
-	}
 
 	ldapURI = os.Getenv("LDAP_URI")
 	ldapUsername = os.Getenv("LDAP_USERNAME")
@@ -228,6 +222,16 @@ func main() {
 	}
 
 	api := iris.New()
+
+	debug := os.Getenv("DEBUG")
+	log.Println(debug)
+	if debug == "true" {
+		log.Println("Running in debug mode")
+		// iris.Logger.Infof("Running in debug mode")
+		api.Config.Render.Template.IsDevelopment = true
+		api.Config.Render.Rest.IndentJSON = true
+	}
+
 	api.Get("/helloworld", helloworld)
 	api.Get("/staff", IsStaff)
 	api.Post("/staff", IsStaff)
