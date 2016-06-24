@@ -2,7 +2,7 @@
 
 
 echo "GET"
-curl "http://localhost:5000/staff?email=one@example.com&email=two@example.com"
+curl "http://localhost:5000/staff?email=pbengtsson@mozilla.com&email=two@example.com"
 echo
 echo "----"
 
@@ -17,12 +17,12 @@ echo
 echo "----"
 
 echo "POST FORM DATA"
-curl -X POST -F "email=one@example.com" -F "email=other@foo.com" http://localhost:5000/staff
+curl -X POST -F "email=one@example.com" -F "email=pbengtsson@mozilla.com" http://localhost:5000/staff
 echo
 echo "----"
 
 echo "POST JSON DATA"
 curl -X POST -H "Content-Type: application/json" \
- -d '{"email": ["one@example.com", "other@foo.com"]}' http://localhost:5000/staff
+ -d '{"email": ["one@example.com", "pbengtsson@mozilla.com"]}' http://localhost:5000/staff
 echo
 echo "----"
