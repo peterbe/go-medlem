@@ -3,49 +3,139 @@
 
 <head>
   <title>Medlem</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/node_modules/bulma/css/bulma.min.css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 </head>
 
 <body>
-  <h1>Medlem</h1>
-  <h2>Is so and so a member?</h2>
-  <p>
-    Going to write something more constructive here later.
-  </p>
+  <section class="hero is-info is-bold">
+    <!-- <div class="hero-head">
+      <div class="container">
+        <nav class="nav">
+          <div class="nav-left">
+            <a class="nav-item" href="/">
+                Medlem
+            </a>
+          </div>
 
-  <form action="">
-    <label>Emails (one per line):</label><br />
-    <textarea rows="10" cols="40"></textarea><br />
-    <button type="submit">Validate</button>
+          <div id="nav-menu" class="nav-right nav-menu">
+            <a class="nav-item" href="https://github.com/peterbe/go-medlem">
+              <span class="icon">
+                <i class="fa fa-github"></i>
+              </span>
+            </a>
 
-    <div id="error" style="display:none">
-      <h3 style="color:red">Submission Error</h3>
-      <pre>
+          </div>
+        </nav>
+      </div>
+    </div> -->
 
-      </pre>
+    <div class="hero-body">
+      <div class="container">
+        <div class="columns is-vcentered">
+          <div class="column">
+            <p class="title">
+              Medlem
+            </p>
+            <p class="subtitle">
+              Is so and so an active member in LDAP?
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="results" style="display:none">
-      <h3>Results</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>
-              Email
-            </th>
-            <th>
-              Result
-            </th>
-          </tr>
-        </thead>
-        <tbody>
 
-        </tbody>
-      </table>
+  </section>
+
+  <section class="section">
+    <h2 class="title is-2">Playground</h2>
+
+    <form action="">
+      <label class="label">Emails (one per line):</label>
+      <p class="control">
+        <textarea class="textarea" placeholder="Textarea"></textarea>
+      </p>
+      <!-- <textarea rows="10" cols="40"></textarea><br /> -->
+      <!-- <button type="submit">Validate</button> -->
+      <p class="control">
+        <button class="button is-primary">Check</button>
+      </p>
+
+
+      <article id="error" style="display:none" class="message is-danger">
+        <div class="message-header">
+          Submission Error
+        </div>
+        <div class="message-body">
+          <pre></pre>
+        </div>
+      </article>
+
+      <div id="results" style="display:none">
+        <h2 class="title">Results</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>
+                Email
+              </th>
+              <th>
+                Result
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+
+          </tbody>
+        </table>
+      </div>
+    </form>
+
+  </section>
+
+  <section class="section">
+    <h2 class="title is-2">Documentation</h2>
+    <div class="content">
+      <h3 class="title is-4">GET with query string</h3>
+      <code>
+        curl <span class="baseurl"></span>/staff?email=one@example.com&amp;email=two@example.com
+      </code>
+
     </div>
-  </form>
+
+    <div class="content">
+      <h3 class="title is-4">POST form data</h3>
+      <code>
+        curl -X POST -F "email=one@example.com" -F "email=two@example.com" <span class="baseurl"></span>/staff
+      </code>
+    </div>
+
+    <div class="content">
+      <h3 class="title is-4">POST JSON data</h3>
+      <code>
+        curl -X POST -H "Content-Type: application/json" -d '{"email": ["one@example.com", "two@example.com"]}' <span class="baseurl"></span>/staff
+      </code>
+    </div>
+
+  </section>
+
+
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">
+        <p>
+          <a class="icon" href="https://github.com/peterbe/go-medlem">
+            <i class="fa fa-github"></i>
+          </a>
+        </p>
+      </div>
+    </div>
+  </footer>
+
 
   <script src="/node_modules/jquery/dist/jquery.min.js"></script>
-  <script src="/static/site.js">
-    </script>
+  <script src="/static/site.js"></script>
 </body>
 
 </html>

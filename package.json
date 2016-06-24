@@ -6,6 +6,7 @@
   "author": "Peter Bengtsson",
   "license": "MPL2",
   "dependencies": {
+    "bulma": "0.0.28",
     "jquery": "3.0.0"
   }
 }
