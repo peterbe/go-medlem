@@ -1,6 +1,7 @@
 package iris
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	"sync"
@@ -10,7 +11,6 @@ import (
 	"github.com/kataras/iris/logger"
 	"github.com/kataras/iris/websocket"
 
-	"github.com/kataras/iris/mail"
 	"github.com/kataras/iris/render/rest"
 	"github.com/kataras/iris/render/template"
 	"github.com/kataras/iris/sessions"
@@ -71,13 +71,20 @@ type Framework struct {
 	rest      *rest.Render
 	templates *template.Template
 	sessions  *sessions.Manager
-	mailer    mail.Service
 	// fields which are useful to the user/dev
 	HTTPServer *Server
 	Config     *config.Iris
 	Logger     *logger.Logger
 	Plugins    PluginContainer
 	Websocket  websocket.Server
+}
+
+// SkipBannerFlag, if enabled then means that this instance ran propably by an external software, which can disable the banner output by the command line argument '-s'
+var SkipBannerFlag bool
+
+func init() {
+	flag.BoolVar(&SkipBannerFlag, "s", false, "Disable banner via command line tool, overrides the logger's config field") // this mostly used by the iris command line tool
+	flag.Parse()
 }
 
 // New creates and returns a new Iris station aka Framework.
@@ -115,11 +122,10 @@ func (s *Framework) initialize() {
 		s.sessions = sessions.New(s.Config.Sessions)
 	}
 
-	//set the rest
+	// set the rest
 	s.rest = rest.New(s.Config.Render.Rest)
 
-	//set mail and templates if not already setted
-	s.prepareMailer()
+	// set templates if not already setted
 	s.prepareTemplates()
 
 	// listen to websocket connections
@@ -136,14 +142,6 @@ func (s *Framework) initialize() {
 
 	if s.Config.MaxRequestBodySize > 0 {
 		s.HTTPServer.MaxRequestBodySize = int(s.Config.MaxRequestBodySize)
-	}
-}
-
-// prepareMailer sets the mailer if not nil, we make this check because of .SendMail, which can be called before Listen
-func (s *Framework) prepareMailer() {
-	// prepare the mail service
-	if s.mailer == nil {
-		s.mailer = mail.New(s.Config.Mail)
 	}
 }
 
@@ -172,7 +170,9 @@ func (s *Framework) openServer() (err error) {
 	s.HTTPServer.SetHandler(s.mux)
 	if err = s.HTTPServer.Open(); err == nil {
 		// print the banner
-		if !s.Config.DisableBanner {
+		if s.Config.DisableBanner || SkipBannerFlag {
+			// skip the banner
+		} else {
 			s.Logger.PrintBanner(banner,
 				fmt.Sprintf("%s: Running at %s\n", time.Now().Format(config.TimeFormat),
 					s.HTTPServer.Host()))

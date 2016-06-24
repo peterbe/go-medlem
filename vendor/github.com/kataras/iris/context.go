@@ -23,10 +23,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/iris-contrib/errors"
 	"github.com/iris-contrib/formBinder"
 	"github.com/kataras/iris/config"
 	"github.com/kataras/iris/context"
-	"github.com/kataras/iris/errors"
 	"github.com/kataras/iris/sessions/store"
 	"github.com/kataras/iris/utils"
 	"github.com/klauspost/compress/gzip"
@@ -769,12 +769,6 @@ func (ctx *Context) SessionDestroy() {
 		}
 	}
 
-}
-
-// SendMail sends a mail to recipients
-// the body can be html also
-func (ctx *Context) SendMail(subject string, body string, to ...string) error {
-	return ctx.framework.SendMail(subject, body, to...)
 }
 
 // Log logs to the iris defined logger

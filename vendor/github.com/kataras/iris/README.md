@@ -6,7 +6,7 @@
 [Travis]: http://travis-ci.org/kataras/iris
 [License Widget]: https://img.shields.io/badge/license-Apache%20License%202.0-E91E63.svg?style=flat-square
 [License]: https://github.com/kataras/iris/blob/master/LICENSE
-[Release Widget]: https://img.shields.io/badge/release-v3.0.0--rc.2-blue.svg?style=flat-square
+[Release Widget]: https://img.shields.io/badge/release-v3.0.0--rc.3-blue.svg?style=flat-square
 [Release]: https://github.com/kataras/iris/releases
 [Gitter Widget]: https://img.shields.io/badge/chat-on%20gitter-00BCD4.svg?style=flat-square
 [Gitter]: https://gitter.im/kataras/iris
@@ -40,87 +40,14 @@ func main() {
 		c.JSON(iris.StatusOK, iris.Map{
 			"Name":  "Iris",
 			"Born":  "13 March 2016",
-			"Stars": 2440,
+			"Stars": 3404,
 		})
 	})
 	iris.Listen(":8080")
 }
 ```
 
-> Learn about [configuration](https://kataras.gitbooks.io/iris/content/configuration.html) and [render](https://kataras.gitbooks.io/iris/content/render.html).
-
-
-```sh
-$ cat test_party.go
-```
-```go
-package main
-
-import (
-	"github.com/kataras/iris"
-	"github.com/kataras/iris/middleware/logger"
-)
-
-func main() {
-	// logger middleware
-	log := logger.New(iris.Logger)
-
-	// group routes by path prefix and middleware sharing
-	group := iris.Party("/users", log)
-	{
-		group.Get("/", func(c *iris.Context) {
-			// return all users or render a template
-		})
-
-		group.Get("/:userID", func(c *iris.Context) {
-			// return a user with ID `c.Param("userID")`
-		})
-
-		group.Delete("/:userID", func(c *iris.Context) {
-			//delete a user with ID `c.Param("userID")`
-		})
-	}
-
-	// using static subdomains
-	subdomain := iris.Party("account.", log, myAuthMiddleware).Layout("layouts/subdomain.html")
-	{
-		subdomain.Get("/", func(c *iris.Context) {
-			// render a template with a context of {username: "myusername"}
-			c.Render("account/index.html", iris.Map{ // we can also use a struct
-				"username": c.Session().GetString("username"),
-			})
-		})
-
-		subdomain.Post("/edit", func(c *iris.Context) {
-			//...
-		})
-	}
-
-	// using dynamic subdomains
-	dynamicSub := iris.Party("*.")
-	{
-		// middleware on route, called before the final handler
-		dynamicSub.Get("/", log, func(c *iris.Context) {
-			c.Write("Hello from subdomain: %s", c.Subdomain())
-		})
-	}
-
-	iris.Listen(":8080")
-}
-
-// using high level sessions inside a custom middleware
-func myAuthMiddleware(c *iris.Context) {
-	s := c.Session()
-
-	if s.GetString("username") == "myusername" && s.GetString("passowrd") == "mypassword" {
-		c.Next()
-	} else {
-		c.EmitError(iris.StatusUnauthorized)
-	}
-}
-
-```
-> Learn about [named parameters](https://kataras.gitbooks.io/iris/content/named-parameters.html), [parties](https://kataras.gitbooks.io/iris/content/party.html) and [subdomains](https://kataras.gitbooks.io/iris/content/subdomains.html).
+> Learn more about [render](https://kataras.gitbooks.io/iris/content/render.html).
 
 Installation
 ------------
@@ -138,19 +65,37 @@ You can find answers by exploring [these questions](https://github.com/kataras/i
 Features
 ------------
 - Focus on high performance
-- Robust routing & static, wildcard subdomains
+- Robust routing supports static and wildcard subdomains
 - View system supporting [5+](https://kataras.gitbooks.io/iris/content/render_templates.html) template engines
 - Highly scalable Websocket API with custom events
 - Sessions support with GC, memory & redis providers
 - Middlewares & Plugins were never be easier
 - Full REST API
 - Custom HTTP Errors
-- Typescript compiler + Browser editor
+- Typescript compiler + Browser-based editor
 - Content negotiation & streaming
 - Transport Layer Security
 - [Reload](https://github.com/kataras/iris/tree/master/iris#run) on source code changes
-- and much more
+- OAuth, OAuth2 supporting  27+ API providers
+- JSON Web Tokens
+- and more
 
+<img src="https://raw.githubusercontent.com/iris-contrib/website/gh-pages/assets/arrowdown.png" width="72"/>
+
+
+| Name        | Description           | Usage  |
+| ------------------|:---------------------:|-------:|
+| [Basicauth Middleware ](https://github.com/iris-contrib/middleware/tree/master/basicauth)      | HTTP Basic authentication                  |[example 1](https://github.com/iris-contrib/examples/blob/master/middleware_basicauth_1/main.go), [example 2](https://github.com/iris-contrib/examples/blob/master/middleware_basicauth_2/main.go), [book section](https://kataras.gitbooks.io/iris/content/basic-authentication.html)  |
+| [JWT Middleware ](https://github.com/iris-contrib/middleware/tree/master/jwt)      | JSON Web Tokens                  |[example ](https://github.com/iris-contrib/examples/blob/master/middleware_jwt/main.go), [book section](https://kataras.gitbooks.io/iris/content/jwt.html)  |
+| [Cors Middleware ](https://github.com/iris-contrib/middleware/tree/master/cors)      | Cross Origin Resource Sharing W3 specification   | [how to use ](https://github.com/iris-contrib/middleware/tree/master/cors#how-to-use)  |
+| [Secure Middleware ](https://github.com/iris-contrib/middleware/tree/master/secure) |  Facilitates some quick security wins      | [example](https://github.com/iris-contrib/examples/blob/master/middleware_secure/main.go)  |
+| [I18n Middleware ](https://github.com/iris-contrib/middleware/tree/master/i18n)      | Simple internationalization       | [example](https://github.com/iris-contrib/examples/tree/master/middleware_internationalization_i18n), [book section](https://kataras.gitbooks.io/iris/content/middleware-internationalization-and-localization.html)  |
+| [Recovery Middleware ](https://github.com/iris-contrib/middleware/tree/master/recovery) | Safety recover the station from panic       | [example](https://github.com/iris-contrib/examples/blob/master/middleware_recovery/main.go)  |
+| [Logger Middleware ](https://github.com/iris-contrib/middleware/tree/master/logger)      | Logs every request       | [example](https://github.com/iris-contrib/examples/blob/master/middleware_logger/main.go), [book section](https://kataras.gitbooks.io/iris/content/logger.html)  |
+| [Editor Plugin](https://github.com/iris-contrib/plugin/tree/master/editor)      | Alm-tools, a typescript online IDE/Editor | [book section](https://kataras.gitbooks.io/iris/content/plugin-editor.html) |
+| [Typescript Plugin](https://github.com/iris-contrib/plugin/tree/master/typescript)      | Auto-compile client-side typescript files      |   [book section](https://kataras.gitbooks.io/iris/content/plugin-typescript.html) |
+| [OAuth,OAuth2 Plugin](https://github.com/iris-contrib/plugin/tree/master/oauth) |  User Authentication was never be easier, supports >27 providers |    [example](https://github.com/iris-contrib/examples/tree/master/plugin_oauth_oauth2), [book section](https://kataras.gitbooks.io/iris/content/plugin-oauth.html) |
+| [Iris control Plugin](https://github.com/iris-contrib/plugin/tree/master/iriscontrol) |   Basic (browser-based) control over your Iris station |    [example](https://github.com/iris-contrib/examples/blob/master/plugin_iriscontrol/main.go), [book section](https://kataras.gitbooks.io/iris/content/plugin-iriscontrol.html) |
 
 Docs & Community
 ------------
@@ -174,6 +119,7 @@ Open debates
 
  - [Contribute: New website and logo for Iris](https://github.com/kataras/iris/issues/153)
  - [E-book Cover - Which one you suggest?](https://github.com/kataras/iris/issues/67)
+ - [Feature request: session.Exists](https://github.com/kataras/iris/issues/214)
 
 **TIP** Be sure to read the [history](HISTORY.md) for Migrating from 2.x to 3.x.
 
@@ -196,13 +142,13 @@ Benchmarks
 Testing
 ------------
 
-Iris suggests you to use [this](https://github.com/gavv/httpexpect) new  suite to test your API.
-[Httpexpect](https://github.com/gavv/httpexpect) supports fasthttp & Iris after [recommandation](https://github.com/gavv/httpexpect/issues/2). Its author is very active so I believe its a promising library. You can view examples [here](https://github.com/gavv/httpexpect/blob/master/example/iris_test.go) and [here](https://github.com/kataras/iris/blob/master/tests/router_test.go).
+Tests are located to the [iris-contrib/tests repository](https://github.com/iris-contrib/tests), community should write some code there!
+I recommend writing your API tests using this new library, [httpexpect](https://github.com/gavv/httpexpect) which supports Iris and fasthttp now, after my request [here](https://github.com/gavv/httpexpect/issues/2).
 
 Versioning
 ------------
 
-Current: **v3.0.0-rc.2**
+Current: **v3.0.0-rc.3**
 >  Iris is an active project
 
 
@@ -222,9 +168,9 @@ Todo
 - [x] Find and provide support for the most stable template engine and be able to change it via the configuration, keep html/templates  support.
 - [x] Extend, test and publish to the public the [Iris' cmd](https://github.com/kataras/iris/tree/master/iris).
 - [x] Route naming and html url func, requested [here](https://github.com/kataras/iris/issues/165).
+- [x] Move middleware & plugins to other repository
 
-
-If you're willing to donate click [here](DONATIONS.md)
+If you're willing to donate click [here](DONATIONS.md)!
 
 People
 ------------

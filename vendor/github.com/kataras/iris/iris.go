@@ -59,8 +59,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/kataras/iris/errors"
-
+	"github.com/iris-contrib/errors"
 	"github.com/kataras/iris/config"
 	"github.com/kataras/iris/context"
 	"github.com/kataras/iris/utils"
@@ -69,7 +68,7 @@ import (
 
 const (
 	// Version of the iris
-	Version = "3.0.0-rc.2"
+	Version = "3.0.0-rc.3"
 	banner  = `         _____      _
         |_   _|    (_)
           | |  ____ _  ___
@@ -101,7 +100,6 @@ type (
 		Lookups() []Route
 		Path(string, ...interface{}) string
 		URL(string, ...interface{}) string
-		SendMail(string, string, ...string) error
 		TemplateString(string, interface{}, ...string) string
 	}
 
@@ -536,19 +534,6 @@ func (s *Framework) URL(routeName string, args ...interface{}) (url string) {
 	}
 
 	return
-}
-
-// SendMail sends a mail to recipients
-// the body can be html also
-func SendMail(subject string, body string, to ...string) error {
-	return Default.SendMail(subject, body, to...)
-}
-
-// SendMail sends a mail to recipients
-// the body can be html also
-func (s *Framework) SendMail(subject string, body string, to ...string) error {
-	s.prepareMailer()
-	return s.mailer.Send(subject, body, to...)
 }
 
 // TemplateString executes a template and returns its result as string, useful when you want it for sending rich e-mails

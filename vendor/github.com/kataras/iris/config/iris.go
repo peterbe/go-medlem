@@ -101,9 +101,6 @@ type (
 		// Websocket contains the configs for Websocket's server integration
 		Websocket *Websocket
 
-		// Mail contains the configs for the mail sender service
-		Mail Mail
-
 		// Server contains the configs for the http server
 		// Server configs are the only one which are setted inside base Iris package (from Listen, ListenTLS, ListenUNIX) NO from users
 		//
@@ -146,7 +143,6 @@ func Default() Iris {
 		Sessions:              DefaultSessions(),
 		Render:                DefaultRender(),
 		Websocket:             DefaultWebsocket(),
-		Mail:                  DefaultMail(),
 		Server:                DefaultServer(),
 	}
 }
