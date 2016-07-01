@@ -8,6 +8,10 @@
 			"Rev": "db4d7e4f68708c5020c392b380e3565df2132840"
 		},
 		{
+			"ImportPath": "github.com/coocood/freecache",
+			"Rev": "1aa53c26cb85c33eef6d832305447982e95f844c"
+		},
+		{
 			"ImportPath": "github.com/eknkc/amber",
 			"Rev": "91774f050c1453128146169b626489e60108ec03"
 		},
@@ -194,6 +198,10 @@
 		{
 			"ImportPath": "github.com/shurcooL/sanitized_anchor_name",
 			"Rev": "10ef21a441db47d8b13ebcc5fd2310f636973c77"
+		},
+		{
+			"ImportPath": "github.com/spaolacci/murmur3",
+			"Rev": "0d12bf811670bf6a1a63828dfbd003eded177fce"
 		},
 		{
 			"ImportPath": "github.com/valyala/bytebufferpool",

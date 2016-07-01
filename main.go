@@ -1,14 +1,20 @@
 package main
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/coocood/freecache"
 	"github.com/kataras/iris"
 	"go.mozilla.org/mozldap"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/mail"
 	"os"
+	"sort"
 )
 
 func index(ctx *iris.Context) {
@@ -117,6 +123,21 @@ func IsStaff(ctx *iris.Context) {
 		return
 	} else {
 
+		// perhaps we have it cached
+		sort.Strings(emails)
+		emailHash := md5.New()
+		for _, email := range emails {
+			io.WriteString(emailHash, email)
+		}
+		cacheKey := "staff:" + hex.EncodeToString(emailHash.Sum(nil))
+		if jsonString, err := cache.Get([]byte(cacheKey)); err == nil {
+			results := make(map[string]bool)
+			if err := json.Unmarshal(jsonString, &results); err == nil {
+				ctx.JSON(iris.StatusOK, results)
+				return
+			}
+		}
+
 		// ldapCertFile and ldapKeyFile needs to be actual file paths
 		// to real files on the filesystem going into mozldap.NewTLSClient
 		// but they might have arrived to us in the form of multiline
@@ -182,6 +203,9 @@ func IsStaff(ctx *iris.Context) {
 				}
 			}
 		}
+		if jsonString, err := json.Marshal(results); err == nil {
+			cache.Set([]byte(cacheKey), []byte(jsonString), 60*5) // 5 min caching
+		}
 		ctx.JSON(iris.StatusOK, results)
 	}
 }
@@ -193,6 +217,8 @@ var (
 	ldapCertFile    string
 	ldapKeyFile     string
 	sampleMultiline string
+	cacheSize       = 10 * 1024 * 1014
+	cache           *freecache.Cache
 )
 
 func main() {
@@ -202,6 +228,8 @@ func main() {
 	if port == "" {
 		log.Fatal("$PORT must be set")
 	}
+
+	cache = freecache.NewCache(cacheSize)
 
 	ldapURI = os.Getenv("LDAP_URI")
 	ldapUsername = os.Getenv("LDAP_USERNAME")
