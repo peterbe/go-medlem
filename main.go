@@ -162,7 +162,7 @@ func IsStaff(ctx *iris.Context) {
 		mailFilter = fmt.Sprintf(
 			"(&(|%s)(objectClass=mozComPerson))", mailFilter,
 		)
-		log.Println("mailFilter:", mailFilter)
+		// log.Println("mailFilter:", mailFilter)
 		entries, searchErr := client.Search(
 			"",
 			mailFilter,
