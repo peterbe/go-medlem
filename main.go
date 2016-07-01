@@ -51,7 +51,7 @@ func getEmails(ctx *iris.Context) ([]string, error) {
 	var emails []string
 	jsonErr := ctx.ReadJSON(&jsonUsers)
 
-	log.Println(ctx.RequestHeader("Content-Type"))
+	// log.Println(ctx.RequestHeader("Content-Type"))
 	if jsonErr != nil {
 		// XXX return a BadRequest if the attempt really was JSON
 		// log.Println("Error when reading JSON body: " + jsonErr.Error())
