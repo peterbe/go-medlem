@@ -24,7 +24,9 @@ $(() => {
         )
         .appendTo(container)
     })
+    $('a.button,pre', '#results').hide()
     $('#results').show()
+
     if (emails.length) {
       $.ajax({
           url: '/staff',
@@ -35,6 +37,7 @@ $(() => {
           dataType: 'json',
         })
         .then((r) => {
+          $('pre', '#results').text(JSON.stringify(r, undefined, 4))
           $('#error').hide()
           $('tr', container).each((i, row) => {
             let email = $('td:first-child', row).text();
@@ -48,6 +51,7 @@ $(() => {
               .append($('<span class="tag is-danger">Nope</span>'))
             }
           })
+          $('a.button', '#results').show()
         })
         .fail((err) => {
           // XXX check if the status code was 400
@@ -59,5 +63,10 @@ $(() => {
           // alert('Failed')
         })
     }
+  })
+
+  $('a.button', '#results').on('click', (event) => {
+    event.preventDefault()
+    $('pre', '#results').toggle()
   })
 })
